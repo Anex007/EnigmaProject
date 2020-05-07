@@ -1,0 +1,43 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Enigma</title>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/0.21.6/system.js"></script>
+    <!-- <script type="text/javascript">
+    SystemJS.import("./main")
+    .then(function (main) { main.default(); })
+    .catch(console.error);
+    </script> -->
+    <style>
+        /* #editor {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+        } */
+        #output {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        width: 100%;
+        height: 100%;
+        /* z-index: 1; */
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- <div id="editor"></div> -->
+    <canvas id="output" tabindex="1"></canvas>
+
+    <script src="enigma.js"></script>
+    <script src="data.js"></script>
+    <script src="crack.js"></script>
+    <script type="text/javascript" src="myimgui.js"></script>
+
+</body>
+</html>
