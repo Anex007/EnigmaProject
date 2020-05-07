@@ -208,15 +208,6 @@ function crack(intercepted) {
             // 2-1-3 V-Q-S
             let rots = getRotorsFromSig(sigs[j].split(' ')[0]);
             const poss = sigs[j].split(' ')[1].split('-').join('');
-            // console.log('Rot:', rots, 'Poss:', poss);
-            // let e = new Enigma({rotors: [rots[0][0], rots[1][0], rots[2][0]],
-            //             knocks: [rots[0][1], rots[1][1], rots[2][1]], plugs: {}, reflector: UKW_B, positions: [poss[0], poss[1], poss[2]]});
-            // const plugs = deducePlugs(unknowns, generateCycleFromRot(rots, poss));
-            /*if (diff !== false) {
-                const score = 6/Object.keys(plugs).length;
-                let value = {score: score, sig: sigs[j], plugs: plugs, rotors: rots, pos: [poss[0], poss[1], poss[2]]};
-                bydiff[diff] = value;
-            }*/
             possibles.push({sig: sigs[j], rots: rots, pos: [poss[0], poss[1], poss[2]]});
         }
         return possibles;
