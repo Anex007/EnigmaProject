@@ -14,6 +14,13 @@ function rotateStringRight(str) {
     return str[str.length - 1] + str.slice(0, str.length - 1);
 }
 
+function rotateStringRightNtimes(n, str) {
+    for (let i = 0; i < n; i++) {
+        str = rotateStringRight(str);
+    }
+    return str;
+}
+
 /* NOTE: str1 and str2 has to be the same length */
 function getSimilarity(str1, str2) {
     let sims = 0;
@@ -24,6 +31,14 @@ function getSimilarity(str1, str2) {
 
 function getStringOfPlug(obj) { // convertes a plugboard object to string
     return JSON.stringify(obj).replace('{', '').replace('}', '').replace(/\"(\w)\":\"(\w)\"/gm, '$1:$2');
+}
+
+function getPlugFromString(str) {
+    try {
+        return JSON.parse(`{${str.replace(/([A-Z])\s*\:\s*([A-Z])/gm, "\"$1\":\"$2\"")}}`);
+    } catch {
+        return {};
+    }
 }
 
 function getCycle(string) {
@@ -156,32 +171,26 @@ function generateCycleSignature() {
     return sigs;
 }
 
-function findAnyCharMatch(str, l_str) {
-    for (let i = 0; i < str.length; i++) {
-        const to_search = str[i];
-        for (let j = 0; j < l_str.length; j++) {
-            const idx = l_str[j].indexOf(to_search);
-            if (idx != -1) return j;
+function checkSetting(plugs, to_match, cur_pattern) {
+    // const idx = to_match.
+    console.log('plugs:', plugs, 'to_match:', to_match, 'cur_pattern:', cur_pattern);
+    if (cur_pattern.length != to_match.length) return false;
+    for (let i = 0; i < to_match.length; i++) {
+        // if (to_match[i] in plugs)
+        if (to_match[i] != cur_pattern[i] && plugs[to_match[i]] != cur_pattern[i]) { // even if its undefined they wont be equal.
+            return false;
         }
     }
-    return -1;
+    
+    return true;
 }
 
-function tryPermutation(current, to_match) {
-    let bestScore = getSimilarity(current, to_match);
-    let bestMatch = current
-    for (let i = 1; i < current.length; i++) {
-        current = rotateStringRight(current);
-        if (getSimilarity(current, to_match) > bestScore) {
-            bestScore = getSimilarity(current, to_match);
-            bestMatch = current;
-        }
+function getCycleFromUnknown(unknowns) {
+    let cyclesToCrack = []
+    for (let i = 0; i < unknowns.length; i++) {
+        cyclesToCrack.push(getCycle(unknowns[i]));
     }
-    return [bestScore, bestMatch];
-}
-
-function checkSetting() {
-
+    return cyclesToCrack;
 }
 
 function crack(intercepted) {
@@ -208,7 +217,10 @@ function crack(intercepted) {
             // 2-1-3 V-Q-S
             let rots = getRotorsFromSig(sigs[j].split(' ')[0]);
             const poss = sigs[j].split(' ')[1].split('-').join('');
-            possibles.push({sig: sigs[j], rots: rots, pos: [poss[0], poss[1], poss[2]]});
+            const base_pattern = generateCycleFromRot(rots, poss);
+            const pattern_to_match = getCycleFromUnknown(unknowns);
+            console.log(base_pattern, 'Match with', pattern_to_match);
+            possibles.push({sig: sigs[j], rots: rots, pos: [poss[0], poss[1], poss[2]], pattern_to_match: pattern_to_match, base_pattern: base_pattern});
         }
         return possibles;
     } else {

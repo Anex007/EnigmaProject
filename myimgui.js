@@ -32,6 +32,14 @@ function getRandInitPositions() {
     return pos;
 }
 
+function getKnocksFromRotors(rots) {
+    let knocks = [];
+    for (let i = 0; i < rots.length; i++) {
+        knocks.push(getKnockFromRotor(rots[i]));
+    }
+    return knocks;
+}
+
 Promise.resolve().then(() => {
     return System.import("imgui-js").then((module) => {
         ImGui = module;
@@ -85,7 +93,7 @@ Promise.resolve().then(() => {
         ImGui.SetNextWindowSize(new ImGui.ImVec2(294, 140), ImGui.Cond.FirstUseEver);
         ImGui.Begin("Debug");
 
-        ImGui.Text(`Application average ${(1000.0 / ImGui.GetIO().Framerate).toFixed(3)} ms/frame (${ImGui.GetIO().Framerate.toFixed(1)} FPS)`);
+        ImGui.Text(`Application average framerate ${(1000.0 / ImGui.GetIO().Framerate).toFixed(3)} ms/frame (${ImGui.GetIO().Framerate.toFixed(1)} FPS)`);
 
         ImGui.End();
 
@@ -120,35 +128,69 @@ Promise.resolve().then(() => {
                 }
             }
         }
-        HelpMarker("Each transmission of Enigma needs to be on new line, ")
+        HelpMarker("Each transmission of Enigma needs to be on new line, ");
+        ImGui.Text("Intercepted: ");
         ImGui.InputTextMultiline("##intercepted", intercepted.value, intercepted.value.size, new ImGui.ImVec2(-1.0, ImGui.GetTextLineHeight() *8));
 
         const crack_switch = STATIC("crack_switch", 0);
         const prev_crack = STATIC("prev_crack", []);
         const plugs_to_try = STATIC("plugs_to_try", new ImGui.ImStringBuffer(64, ""));
-        const decrypted = STATIC('output', new ImGui.ImStringBuffer(1024 * 16, ''));
+        const decrypted = STATIC('decrypted', new ImGui.ImStringBuffer(1024 * 16, ''));
 
         if (ImGui.Button("Crack")) {
-            prev_crack.value = crack(intercepted.value.buffer.split('\n'));
+            const to_crack = intercepted.value.buffer.split('\n');
+            if (to_crack[0].length > 6)  prev_crack.value = crack(to_crack);
         }
         ImGui.InputText("Plugboard", plugs_to_try.value, plugs_to_try.value.size);
-        HelpMarker("Starting from the top each drop down shows a possible setting that matched");
+        HelpMarker("Starting from the top each drop down shows a possible setting that matched This assumes the reflector is UKW Beta");
         if (prev_crack.value !== false) {
             for (let i = 0; i < prev_crack.value.length; i++) {
-                // Title of the drop down needs to be ROT POS + score in %
                 const cur = prev_crack.value[i];
                 if (ImGui.TreeNode(cur.sig)) {
-                    if (ImGui.Button("Check")) {
+                    // if (ImGui.Button("Check")) {
+                        // let engima = new Enigma({rotors: cur.rots, knocks: getKnocksFromRotors(cur.rots), plugs: plugboard, reflector: UKW_B, positions: cur.pos});
                         // Whenever This is true try outputting to decrypted.
+                    // }
+                    
+                    ImGui.Columns(2, "Rotor Sim");
+                    ImGui.Separator();
+                    for (let pair = 0; pair < 3; pair++) {
+                        const cur_pair = cur.base_pattern[pair];
+                        for (let n = 0; n < cur_pair.length; n++) {
+                            const rotation = STATIC(`rotate_string_${pair}_${n}_${cur.sig}`, 0);
+                            const my_popup = `settings_popup_${pair}_${n}`;
+                            if (ImGui.Button(rotateStringRightNtimes(rotation.value, cur_pair[n]))) {
+                                ImGui.OpenPopup(my_popup);
+                            }
+                            if (ImGui.BeginPopup(my_popup)) {
+                                const rotation = STATIC(`rotate_string_${pair}_${n}_${cur.sig}`, 0);
+                                ImGui.SliderInt("Rotate string", (value = rotation.value) => rotation.value = value, 0, cur_pair[n].length-1);
+                                ImGui.EndPopup();
+                            }
+                            ImGui.SameLine();
+                        }
+                        ImGui.NewLine();
+                        ImGui.NextColumn();
+                        const to_match = cur.pattern_to_match[pair];
+                        for (let n = 0; n < to_match.length; n++) {
+                            const rotation = STATIC(`rotate_string_${pair}_${n}_${cur.sig}`, 0);
+                            let err_color = checkSetting(getPlugFromString(plugs_to_try.value.buffer), cur_pair[n], rotateStringRightNtimes(rotation.value, to_match[n])) ? new ImGui.ImVec4(0.0, 1.0, 0.0, 1.0): new ImGui.ImVec4(1.0, 0.0, 0.0, 1.0);
+                            ImGui.TextColored(err_color, to_match[n]);
+                            ImGui.SameLine();
+                        }
+                        ImGui.NextColumn();
                     }
+
+                    ImGui.Columns(1);
+                    ImGui.Separator();
+                    ImGui.TreePop();
                 }
             }
         } else {
-            ImGui.TextColored(new imgui_20.ImVec4(1.0, 0.0, 0.0, 1.0), "No Signature was matched :(");
+            ImGui.TextColored(new ImGui.ImVec4(1.0, 0.0, 0.0, 1.0), "No Signature was matched :(");
         }
+        ImGui.Text("Decrypted: ");
         ImGui.InputTextMultiline('##decrypted', decrypted.value, decrypted.value.size, new ImGui.ImVec2(-1.0, ImGui.GetTextLineHeight() * 8), ImGui.ImGuiInputTextFlags.ReadOnly);
-
-        // We only need a single plugboard texbox to play around.
 
         ImGui.End();
 
@@ -180,20 +222,18 @@ Promise.resolve().then(() => {
         ImGui.PushItemWidth(400);
         ImGui.InputText("Pluboard", plugs.value, plugs.value.size);
 
+        ImGui.Text("PlainText: ");
         ImGui.InputTextMultiline('##source1', input.value, input.value.size, new ImGui.ImVec2(-1.0, ImGui.GetTextLineHeight() * 8), ImGui.ImGuiInputTextFlags.AllowTabInput);
-        // const output =
         if (ImGui.Button("Encrypt")) {
-            // ImGui.Text(`Rotor 1 ${rotor1_cur.value}, Rotor 2 ${rotor2_cur.value} Rotor 3 ${rotor3_cur.value} Reflector ${reflector_cur.value}`);
-            // ImGui.Text(`Plug : ${input.value}`);
             const rots = [ROTORS[rotor1_cur.value], ROTORS[rotor2_cur.value], ROTORS[rotor3_cur.value]];
             const rotknocks = [ROTOR_KNOCKS[rotor1_cur.value], ROTOR_KNOCKS[rotor2_cur.value], ROTOR_KNOCKS[rotor3_cur.value]];
             const reflector = REFLECTORS[reflector_cur.value];
-            const plugboard = JSON.parse(`{${plugs.value.buffer.replace(/([A-Z])\s*\:\s*([A-Z])/gm, "\"$1\":\"$2\"")}}`);
+            const plugboard = getPlugFromString(plugs.value.buffer);
 
             let engima = new Enigma({rotors: rots, knocks: rotknocks, plugs: plugboard, reflector: reflector, positions: [pos1.value.buffer, pos2.value.buffer, pos3.value.buffer]});
-            // output.value.buffer = plugboard.toString();
             output.value.buffer = engima.cipher(input.value.buffer);
         }
+        ImGui.Text("CipherText: ");
         ImGui.InputTextMultiline('##source2', output.value, output.value.size, new ImGui.ImVec2(-1.0, ImGui.GetTextLineHeight() * 8), ImGui.ImGuiInputTextFlags.ReadOnly);
 
         ImGui.End();
