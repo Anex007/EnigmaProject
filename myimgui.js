@@ -69,9 +69,6 @@ Promise.resolve().then(() => {
 
     const clear_color = new ImGui.ImVec4(0.45, 0.55, 0.60, 1.00);
 
-    // let buf = "Quick brown fox";
-    // let f = 0.6;
-
     function HelpMarker(desc) {
         ImGui.TextDisabled("(?)");
         if (ImGui.IsItemHovered()) {
