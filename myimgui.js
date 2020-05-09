@@ -215,7 +215,7 @@ Promise.resolve().then(() => {
 
         ImGui.End();
 
-        ImGui.SetNextWindowPos(new ImGui.ImVec2(940, 70));
+        ImGui.SetNextWindowPos(new ImGui.ImVec2(940, 70), ImGui.Cond.FirstUseEver);
         ImGui.SetNextWindowSize(new ImGui.ImVec2(650, 500), ImGui.Cond.FirstUseEver);
         ImGui.Begin("Enigma Emulator");
         const ROTORNAMES = ['I', 'II', 'III', 'IV', 'V'];
