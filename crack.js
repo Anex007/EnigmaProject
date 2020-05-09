@@ -33,7 +33,7 @@ function getStringOfPlug(obj) { // convertes a plugboard object to string
     return JSON.stringify(obj).replace('{', '').replace('}', '').replace(/\"(\w)\":\"(\w)\"/gm, '$1:$2');
 }
 
-function getPlugFromString(str) {
+function getPlugFromString(str) { // coverts a comma seperated key value pairs of uppercase characters into an object
     try {
         return JSON.parse(`{${str.replace(/([A-Z])\s*\:\s*([A-Z])/gm, "\"$1\":\"$2\"")}}`);
     } catch {
@@ -172,12 +172,10 @@ function generateCycleSignature() {
 }
 
 function checkSetting(plugs, to_match, cur_pattern) {
-    // const idx = to_match.
-    console.log('plugs:', plugs, 'to_match:', to_match, 'cur_pattern:', cur_pattern);
     if (cur_pattern.length != to_match.length) return false;
     for (let i = 0; i < to_match.length; i++) {
-        // if (to_match[i] in plugs)
-        if (to_match[i] != cur_pattern[i] && plugs[to_match[i]] != cur_pattern[i]) { // even if its undefined they wont be equal.
+        if (to_match[i] != cur_pattern[i] && plugs[to_match[i]] != cur_pattern[i] && plugs[cur_pattern[i]] != to_match[i]) { // even if its undefined they wont be equal.
+            if ((getRandomInt() % 30) == 5) console.log('plugs:', plugs, 'to_match:', to_match, 'cur_pattern:', cur_pattern);
             return false;
         }
     }
@@ -195,7 +193,6 @@ function getCycleFromUnknown(unknowns) {
 
 function crack(intercepted) {
     let unknowns = ['99999999999999999999999999', '99999999999999999999999999', '99999999999999999999999999']; // temps
-    // let bydiff = {};
     let possibles = [];
 
     for (let i = 0; i < intercepted.length; i++) {
@@ -206,20 +203,14 @@ function crack(intercepted) {
         unknowns[2] = strReplaceAt(unknowns[2], toCharI(mesg[2]), mesg[5]);
     }
     
-    // TODO: We need a way to match exactly if theres no difference which means no plugboard was used.
     let cycle = getCycleSignature(unknowns);
-    console.log(cycle);
     if (cycle in signature_db) {
         const sigs = signature_db[cycle];
-        console.log("We've got", sigs.length, "number of matches");
-        console.log("We've got", sigs);
         for (let j = 0; j < sigs.length; j++) {
-            // 2-1-3 V-Q-S
             let rots = getRotorsFromSig(sigs[j].split(' ')[0]);
             const poss = sigs[j].split(' ')[1].split('-').join('');
             const base_pattern = generateCycleFromRot(rots, poss);
             const pattern_to_match = getCycleFromUnknown(unknowns);
-            console.log(base_pattern, 'Match with', pattern_to_match);
             possibles.push({sig: sigs[j], rots: rots, pos: [poss[0], poss[1], poss[2]], pattern_to_match: pattern_to_match, base_pattern: base_pattern});
         }
         return possibles;
@@ -255,14 +246,8 @@ function generateCycleFromRot(rots, pos) {
         }
     }
 
-    // console.log(cycles);
-    
     return cycles;
 }
-
-let inter = encryptMultiInEnigmaProtocol([M3_ROTOR1, M3_ROTOR2, M3_ROTOR3], [M3_ROTOR1_KNOCK, M3_ROTOR2_KNOCK, M3_ROTOR3_KNOCK], {'A': 'C', 'M': 'D', 'F': 'H', 'L': 'O', 'P': 'Z'}, UKW_B, ['G', 'J', 'C'], [['C','M','C'],['B','C','A'],['F','U','D'],['K','O','P'],['H','B','H'],['J','I','S'],['I','S','B'],['N','Z','O'],['Y','J','X'],['G','D','F'],['Q','X','Z'],['O','U','Y'],['D','H','E'],['L','Z','R'],['V','K','Z'],['T','L','I'],['S','U','Q'],['W','U','M'],['Z','W','U'],['T','T','N'],['E','Y','S'],['U','M','T'],['T','V','M'],['T','X','G'],['P','S','V'],['T','G','W'],['M','A','T'],['R','Y','T'],['A','S','L'],['W','N','O'],['T','S','T'],['A','R','K'],['Z','P','J'],['T','E','W'],['T','Q','D'],['X','S','S'],['W','F','N']], ['Thisisasmallstringtest','Youcanreadthisifyoujust','gettheADC','Thisisnotajoke','Ihopethisworks','Ifthisworksonthefirst','tryihavetodo','somethingtoyou','maybeillfinally','turnmypcoff','foranentireday','youvebeengoodtome','currentuptimeis','twentydaysoof','okayyeahineedto','shutdownthiscomputer','todaynomatterwhat','ijusthatehavingto','reloadthetabsivebeen','workingonfirefox','godwhyidokeepchecking','myphoneiamanticipating','speakingofineedto','gosendsnapchatstreaks','forthedayihope','tosleepbefore2today','ialsohopethisworksonthefirsttry','oknvmthefirsttry','wasnotasuccessas','ihadhopedbutiwasableto','quicklyfigureoutwhy','whichisthereasonamadding','moredatatothislist','hopefullyinoneofthis','thekeygetsumixedand','everythingshouldbecome','visiblealrpraythisworks']);
-// console.log(inter);
-crack(inter);
 
 // var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(generateCycleSignature()));
 

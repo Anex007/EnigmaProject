@@ -184,7 +184,6 @@ function encryptInEnigmaProtocol(rotors, knocks, plugs, reflector, ground_settin
     let out = '';
     let groundEnigma = new Enigma({rotors: rotors, knocks: knocks, plugs: plugs, reflector: reflector, positions: ground_setting});
     out += groundEnigma.cipher(ring_setting.join('').repeat(2));
-    console.log(out);
     let ringEnigma = new Enigma({rotors: rotors, knocks: knocks, plugs: plugs, reflector: reflector, positions: ring_setting});
     out += ringEnigma.cipher(message);
     return out;
@@ -197,6 +196,20 @@ function encryptMultiInEnigmaProtocol(rotors, knocks, plugs, reflector, ground_s
     for (let i = 0; i < ring_settings.length; i++)
         ciphered.push(encryptInEnigmaProtocol(rotors, knocks, plugs, reflector, ground_setting, ring_settings[i], messages[i]));
     return ciphered;
+}
+
+/* messages needs to be an array of messages!! */
+function decryptMultiInEnigmaProtocol(rotors, knocks, plugs, reflector, ground_setting, messages) {
+    let plaintext = '';
+    for (let i = 0; i < messages.length; i++) {
+        if (messages[i].length < 6) continue;
+        let groundEnigma = new Enigma({rotors: rotors, knocks: knocks, plugs: plugs, reflector: reflector, positions: ground_setting});
+        let ring_setting = groundEnigma.cipher(messages[i].slice(0, 6))
+        plaintext += ring_setting;
+        let ringEnigma = new Enigma({rotors: rotors, knocks: knocks, plugs: plugs, reflector: reflector, positions: [ring_setting[0], ring_setting[1], ring_setting[2]]});
+        plaintext += ' ' + ringEnigma.cipher(messages[i].slice(6)) + '\n';
+    }
+    return plaintext;
 }
  
 // Royal Flags Wave Kings Above.
