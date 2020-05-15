@@ -95,33 +95,29 @@ Promise.resolve().then(() => {
         ImGui.SetNextWindowSize(new ImGui.ImVec2(900, 500), ImGui.Cond.FirstUseEver);
         ImGui.Begin('Enigma Cracker');
         const intercepted = STATIC("intercepted", new ImGui.ImStringBuffer(1024 * 16, ''));
-        const random_inter = STATIC('random_inter', new ImGui.ImStringBuffer(1024 * 16, ''));
 
-        if (ImGui.CollapsingHeader("Create Test Interception")) {
-            ImGui.InputTextMultiline('##random_inter', random_inter.value, random_inter.value.size, new ImGui.ImVec2(-1.0, ImGui.GetTextLineHeight() * 8), ImGui.ImGuiInputTextFlags.ReadOnly);
-            if (ImGui.Button("Generate Interception")) {
-                let rots_to_choose = [[M3_ROTOR1, M3_ROTOR1_KNOCK], [M3_ROTOR2, M3_ROTOR2_KNOCK], [M3_ROTOR3, M3_ROTOR3_KNOCK]];// You have to make sure there wont be a bug by giving the value twice.
-                let rots = [];
-                for (let i = 0; i < 3; i++) {
-                    const idx = getRandomInt() % rots_to_choose.length;
-                    rots.push(rots_to_choose.splice(idx, 1)[0]);
-                }
+        if (ImGui.Button("Generate Interception")) {
+            let rots_to_choose = [[M3_ROTOR1, M3_ROTOR1_KNOCK], [M3_ROTOR2, M3_ROTOR2_KNOCK], [M3_ROTOR3, M3_ROTOR3_KNOCK]];// You have to make sure there wont be a bug by giving the value twice.
+            let rots = [];
+            for (let i = 0; i < 3; i++) {
+                const idx = getRandomInt() % rots_to_choose.length;
+                rots.push(rots_to_choose.splice(idx, 1)[0]);
+            }
 
-                let plugs = {}
-                const num_plugs = 4 + getRandomInt() % 3;
-                let alphabets = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
-                for (let i = 0; i < num_plugs; i++) {
-                    const k = alphabets.splice(getRandomInt() % alphabets.length, 1)[0];
-                    const v = alphabets.splice(getRandomInt() % alphabets.length, 1)[0];
-                    plugs[k] = v;
-                }
+            let plugs = {}
+            const num_plugs = 4 + getRandomInt() % 3;
+            let alphabets = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+            for (let i = 0; i < num_plugs; i++) {
+                const k = alphabets.splice(getRandomInt() % alphabets.length, 1)[0];
+                const v = alphabets.splice(getRandomInt() % alphabets.length, 1)[0];
+                plugs[k] = v;
+            }
 
-                let inter = encryptMultiInEnigmaProtocol([rots[0][0], rots[1][0], rots[2][0]], [rots[0][1], rots[1][1], rots[2][1]], plugs, UKW_B, getRandInitPositions(), [['C','M','C'],['B','C','A'],['F','U','D'],['K','O','P'],['H','B','H'],['J','I','S'],['I','S','B'],['N','Z','O'],['Y','J','X'],['G','D','F'],['Q','X','Z'],['O','U','Y'],['D','H','E'],['L','Z','R'],['V','K','Z'],['T','L','I'],['S','U','Q'],['W','U','M'],['Z','W','U'],['T','T','N'],['E','Y','S'],['U','M','T'],['T','V','M'],['T','X','G'],['P','S','V'],['T','G','W'],['M','A','T'],['R','Y','T'],['A','S','L'],['W','N','O'],['T','S','T'],['A','R','K'],['Z','P','J'],['T','E','W'],['T','Q','D'],['X','S','S'],['W','F','N']], ['Yourbraingetssmartbutyourheadgetsdumb','Somebodyoncetoldmetheworldisgonnarollme','Gettheshowongetpaid','TheythoughttheywasallofthatThenyoushowedupandbamThey','ListenlittledonkeyTakealookatmeWhatamI','beconsideredafreakWellmaybeyoudoButthatswhywegotta','Hehuffedundhepuffedundhesignedanevictionnotice','OkayIlltellyouDoyouknowthemuffinman','andcleaningforhertwoevilsistersPleasewelcomeCinderella','SilenceIwillmakethisPrincessFionamyqueenandDuLocwill','ShelikessushiandhottubbinganytimeHerhobbiesincludecooking','EveningMirrormirroronthewallIsthisnotthemostperfect','curYesIknowthemuffinmanwholivesonDruryLanentuptimeis','princessjustsoFarquaadwillgiveyoubackaswampwhichyouonly','puttheirheadsonapikegottenaknifecutopentheirspleenand','runnerupwilltakehisplaceandsoonandsoforthSomeofyoumae','Thatchampionshallhavethehonornonotheprivilegetogo','runnerupwilltakehisplaceandsoonandsoforthSomeofyoumae','princessjustsoFarquaadwillgiveyoubackaswampwhichyouonly','puttheirheadsonapikegottenaknifecutopentheirspleenand','drinktheirfluidsDoesthatsoundgoodtoyou','Withadragonthatbreathesfireandeatsknightsandbreathesfire','itsuredoesntmeanyoureacowardifyourealittlescared','courseyoureagirldragonYourejustreekingoffemininebeauty','OkayyoutwoheardfortheexitIlltakecareofthedragon','HmmWithShrekYouthinkWaitWaitYouthinkthatShrekisyoutruelove','ButIhavetoberescuedbymytruelovenotbysomeprgeandhispet','theresBloodnuttheFlatulentYoucanguesswhathesfamousfor','HeyShrekwhatwegonnadowhenwegetourswampanyway','Nothisisoneofthosedropitandleaveitalonethings','LookImnottheonewiththeproblemokayItstheworldthat','seemstohaveaproblemwithmePeopletakeonelookatmeandgo','youlegselevatedTurnyourheadandcoughDoesanyoneknowthe','YouknowshesrightYoulookawfulDoyouwanttositdown','thatuglyWellIaintgonnalieYouareuglyButyouonlylook','ButDonkeyImaprincessandthisisnothowaprincessismeant','PeopleofDuLocwegatherheretodaytobearwitnsstotheunion']);
+            let inter = encryptMultiInEnigmaProtocol([rots[0][0], rots[1][0], rots[2][0]], [rots[0][1], rots[1][1], rots[2][1]], plugs, UKW_B, getRandInitPositions(), [['C','M','C'],['B','C','A'],['F','U','D'],['K','O','P'],['H','B','H'],['J','I','S'],['I','S','B'],['N','Z','O'],['Y','J','X'],['G','D','F'],['Q','X','Z'],['O','U','Y'],['D','H','E'],['L','Z','R'],['V','K','Z'],['T','L','I'],['S','U','Q'],['W','U','M'],['Z','W','U'],['T','T','N'],['E','Y','S'],['U','M','T'],['T','V','M'],['T','X','G'],['P','S','V'],['T','G','W'],['M','A','T'],['R','Y','T'],['A','S','L'],['W','N','O'],['T','S','T'],['A','R','K'],['Z','P','J'],['T','E','W'],['T','Q','D'],['X','S','S'],['W','F','N']], ['Yourbraingetssmartbutyourheadgetsdumb','Somebodyoncetoldmetheworldisgonnarollme','Gettheshowongetpaid','TheythoughttheywasallofthatThenyoushowedupandbamThey','ListenlittledonkeyTakealookatmeWhatamI','beconsideredafreakWellmaybeyoudoButthatswhywegotta','Hehuffedundhepuffedundhesignedanevictionnotice','OkayIlltellyouDoyouknowthemuffinman','andcleaningforhertwoevilsistersPleasewelcomeCinderella','SilenceIwillmakethisPrincessFionamyqueenandDuLocwill','ShelikessushiandhottubbinganytimeHerhobbiesincludecooking','EveningMirrormirroronthewallIsthisnotthemostperfect','curYesIknowthemuffinmanwholivesonDruryLanentuptimeis','princessjustsoFarquaadwillgiveyoubackaswampwhichyouonly','puttheirheadsonapikegottenaknifecutopentheirspleenand','runnerupwilltakehisplaceandsoonandsoforthSomeofyoumae','Thatchampionshallhavethehonornonotheprivilegetogo','runnerupwilltakehisplaceandsoonandsoforthSomeofyoumae','princessjustsoFarquaadwillgiveyoubackaswampwhichyouonly','puttheirheadsonapikegottenaknifecutopentheirspleenand','drinktheirfluidsDoesthatsoundgoodtoyou','Withadragonthatbreathesfireandeatsknightsandbreathesfire','itsuredoesntmeanyoureacowardifyourealittlescared','courseyoureagirldragonYourejustreekingoffemininebeauty','OkayyoutwoheardfortheexitIlltakecareofthedragon','HmmWithShrekYouthinkWaitWaitYouthinkthatShrekisyoutruelove','ButIhavetoberescuedbymytruelovenotbysomeprgeandhispet','theresBloodnuttheFlatulentYoucanguesswhathesfamousfor','HeyShrekwhatwegonnadowhenwegetourswampanyway','Nothisisoneofthosedropitandleaveitalonethings','LookImnottheonewiththeproblemokayItstheworldthat','seemstohaveaproblemwithmePeopletakeonelookatmeandgo','youlegselevatedTurnyourheadandcoughDoesanyoneknowthe','YouknowshesrightYoulookawfulDoyouwanttositdown','thatuglyWellIaintgonnalieYouareuglyButyouonlylook','ButDonkeyImaprincessandthisisnothowaprincessismeant','PeopleofDuLocwegatherheretodaytobearwitnsstotheunion']);
 
-                random_inter.value.buffer = ''
-                for (let i = 0; i < inter.length; i++) {
-                    random_inter.value.buffer += inter[i] + '\n';
-                }
+            intercepted.value.buffer = ''
+            for (let i = 0; i < inter.length; i++) {
+                intercepted.value.buffer += inter[i] + '\n';
             }
         }
         HelpMarker("Each transmission of Enigma needs to be on new line, ");
