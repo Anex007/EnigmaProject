@@ -5,7 +5,19 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Enigma</title>
 
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/0.21.6/system.js"></script>
+    <script src="crack.js"></script>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/flyover/system.ts/build/system.js"></script>
+    <script src="system.config.js"></script>
+    <script>
+        System.import("main")
+        .then(function(main) {main.default(); })
+        .catch(console.error);
+    </script>
+
+<script src="enigma.js"></script>
+<script src="data.js"></script>
+<!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/0.21.6/system.js"></script>
     <!-- <script type="text/javascript">
     SystemJS.import("./main")
     .then(function (main) { main.default(); })
@@ -30,14 +42,11 @@
     </style>
 </head>
 <body>
-    
-    <!-- <div id="editor"></div> -->
-    <canvas id="output" tabindex="1"></canvas>
 
-    <script src="enigma.js"></script>
-    <script src="data.js"></script>
-    <script src="crack.js"></script>
-    <script type="text/javascript" src="myimgui.js"></script>
+    <!-- <div id="editor"></div> -->
+    <!-- <canvas id="output" tabindex="1"></canvas> -->
+
+    <!-- <script type="text/javascript" src="myimgui.js"></script> -->
 
 </body>
 </html>

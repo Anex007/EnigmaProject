@@ -1,3 +1,25 @@
+function getRandomInt() {
+    return Math.trunc(Math.random() * 100);
+}
+
+function getRandInitPositions() {
+    let alphabets = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let pos = [];
+    for (let i = 0; i < 3; i++) {
+        pos.push(alphabets[getRandomInt() % alphabets.length]);
+    }
+    return pos;
+}
+
+function getKnocksFromRotors(rots) {
+    let knocks = [];
+    for (let i = 0; i < rots.length; i++) {
+        knocks.push(getKnockFromRotor(rots[i]));
+    }
+    return knocks;
+}
+
+
 function strReplaceAt (str, index, replacement) {
     return str.substr(0, index) + replacement + str.substr(index + replacement.length);
 }
