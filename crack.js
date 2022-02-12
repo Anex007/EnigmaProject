@@ -112,7 +112,7 @@ function getLast(str) {
 
 /* This gives you the cycle signature associated with the given table */
 function constructTableSignature(table) {
-    
+
     let cycles = [[table[0][0]+table[0][3]], [table[0][1]+table[0][4]], [table[0][2]+table[0][5]]];
     // This loop automates the same patter for p4.p1 & p5.p2 & p6.p3 based on the offset from i
     let sig = '';
@@ -145,7 +145,7 @@ function constructTableSignature(table) {
 }
 
 /*
- Generate the signature of cycles for the alphabets. the key is in the form "10-10-6 23-3 13-10-2-1" 
+ Generate the signature of cycles for the alphabets. the key is in the form "10-10-6 23-3 13-10-2-1"
  NOTE: This only generates the cycle for rotors 1,2 & 3; The value at the key is of the form r1-r2-r3 p1-p2-p3
  where r means rotor and p means rotos position
 */
@@ -161,7 +161,7 @@ function generateCycleSignature() {
     ];
 
     const rot_names = ['1-2-3', '1-3-2', '2-3-1', '2-1-3', '3-1-2', '3-2-1'];
-    
+
     for (let p = 0; p < 6; p++) {
         const cur_rot = rots[p];
         for (let x = 0; x < 26; x++) {
@@ -195,13 +195,16 @@ function generateCycleSignature() {
 
 function checkSetting(plugs, to_match, cur_pattern) {
     if (cur_pattern.length != to_match.length) return false;
+
+    pboard = Plugboard(plugs);
+
     for (let i = 0; i < to_match.length; i++) {
-        if (to_match[i] != cur_pattern[i] && plugs[to_match[i]] != cur_pattern[i] && plugs[cur_pattern[i]] != to_match[i]) { // even if its undefined they wont be equal.
-            if ((getRandomInt() % 30) == 5) console.log('plugs:', plugs, 'to_match:', to_match, 'cur_pattern:', cur_pattern);
+        if (to_match[i] != pboard.map(cur_pattern[i])) { // even if its undefined they wont be equal.
+            //if ((getRandomInt() % 30) == 5) console.log('plugs:', plugs, 'to_match:', to_match, 'cur_pattern:', cur_pattern);
             return false;
         }
     }
-    
+
     return true;
 }
 
@@ -224,7 +227,7 @@ function crack(intercepted) {
         unknowns[1] = strReplaceAt(unknowns[1], toCharI(mesg[1]), mesg[4]);
         unknowns[2] = strReplaceAt(unknowns[2], toCharI(mesg[2]), mesg[5]);
     }
-    
+
     let cycle = getCycleSignature(unknowns);
     if (cycle in signature_db) {
         const sigs = signature_db[cycle];
