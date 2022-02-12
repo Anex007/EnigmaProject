@@ -196,10 +196,11 @@ function generateCycleSignature() {
 function checkSetting(plugs, to_match, cur_pattern) {
     if (cur_pattern.length != to_match.length) return false;
 
-    pboard = Plugboard(plugs);
+    pboard = new Plugboard(plugs);
 
     for (let i = 0; i < to_match.length; i++) {
-        if (to_match[i] != pboard.map(cur_pattern[i])) { // even if its undefined they wont be equal.
+        mapped = pboard.charmap.charmap[toCharI(to_match[i])];
+        if (mapped != cur_pattern[i]) { // even if its undefined they wont be equal.
             //if ((getRandomInt() % 30) == 5) console.log('plugs:', plugs, 'to_match:', to_match, 'cur_pattern:', cur_pattern);
             return false;
         }
